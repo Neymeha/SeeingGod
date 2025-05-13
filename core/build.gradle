@@ -46,7 +46,6 @@ dependencies {
   api "io.github.libktx:ktx-vis-style:$ktxVersion"
   api "io.github.libktx:ktx-vis:$ktxVersion"
   api "net.onedaybeard.artemis:artemis-odb:$artemisOdbVersion"
-  api "org.apache.groovy:groovy-all:$groovyVersion"
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 

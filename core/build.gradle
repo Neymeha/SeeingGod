@@ -47,6 +47,11 @@ dependencies {
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 
+  implementation("io.github.microutils:kotlin-logging:2.1.23")
+  implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+  implementation("org.slf4j:slf4j-api:2.0.0")
+  implementation("ch.qos.logback:logback-classic:1.4.6")
+
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }

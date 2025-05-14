@@ -1,38 +1,33 @@
 package com.neymeha.game.seeinggod
 
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.neymeha.game.seeinggod.screens.FirstScreen
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
-import ktx.app.clearScreen
-import ktx.assets.disposeSafely
-import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
-import ktx.graphics.use
 
+/**
+ * Главный класс игры — точка входа.
+ * Наследуется от [KtxGame] с типом экранов [KtxScreen].
+ *
+ * Используем KTX-подход для лаконичного и модульного управления экранами.
+ */
 class SeeingGod : KtxGame<KtxScreen>() {
+
+    /**
+     * Метод create() вызывается один раз при запуске игры.
+     * Здесь инициализируется всё необходимое для старта.
+     */
     override fun create() {
+        Log.logger.info { "Игра запускается..." }
+        // Инициализация корутин (KTX-обёртка над kotlinx.coroutines)
+        // Позволяет использовать асинхронные задачи в игре (например, загрузку ресурсов)
         KtxAsync.initiate()
 
+        // Регистрируем экран в менеджере экранов
+        // Это позволяет переключаться между экранами по имени класса
         addScreen(FirstScreen())
+
+        // Устанавливаем экран, который будет отображаться при запуске
         setScreen<FirstScreen>()
-    }
-}
-
-class FirstScreen : KtxScreen {
-    private val image = Texture("logo.png".toInternalFile(), true).apply { setFilter(Linear, Linear) }
-    private val batch = SpriteBatch()
-
-    override fun render(delta: Float) {
-        clearScreen(red = 0.7f, green = 0.7f, blue = 0.7f)
-        batch.use {
-            it.draw(image, 100f, 160f)
-        }
-    }
-
-    override fun dispose() {
-        image.disposeSafely()
-        batch.disposeSafely()
     }
 }

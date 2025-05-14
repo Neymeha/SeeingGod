@@ -30,7 +30,7 @@ class SpawnSystem(private val engine: Engine) : EntitySystem() {
                 engine.removeEntity(entity)
 
                 // Создаем нового врага через EnemyFactory
-//                engine.addEntity(EnemyFactory.createEnemy())
+                engine.addEntity(EnemyFactory.createEnemy())
 
                 // Прерываем цикл — в текущей версии только один враг активен за раз
                 break

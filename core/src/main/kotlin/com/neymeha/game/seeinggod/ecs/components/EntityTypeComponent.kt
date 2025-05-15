@@ -7,7 +7,9 @@ class EntityTypeComponent(val type: EntityType) : Component
 
 enum class EntityType {
     ENEMY,
+    BOSS,
     GOLD,
     PLAYER,
-    OBSTACLE
+    ATTENDANT,
+    COMPANION,
 }

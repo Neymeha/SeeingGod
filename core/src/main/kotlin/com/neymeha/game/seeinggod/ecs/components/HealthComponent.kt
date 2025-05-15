@@ -11,6 +11,6 @@ import com.badlogic.ashley.core.Component
  * @property currentHealth Текущее количество здоровья сущности.
  */
 class HealthComponent(
-    var maxHealth: Int,    // Максимальное количество здоровья сущности.
-    var currentHealth: Int // Текущее количество здоровья сущности.
+    var maxHealth: Long,    // Максимальное количество здоровья сущности.
+    var currentHealth: Long // Текущее количество здоровья сущности.
 ) : Component

@@ -2,8 +2,9 @@ package com.neymeha.game.seeinggod.ecs.systems
 
 import com.badlogic.ashley.core.*
 import com.badlogic.ashley.utils.ImmutableArray
+import com.neymeha.game.seeinggod.ecs.components.EntityType
 import com.neymeha.game.seeinggod.ecs.components.HealthComponent
-import com.neymeha.game.seeinggod.ecs.factory.EnemyFactory
+import com.neymeha.game.seeinggod.ecs.factory.EntityFactory
 import com.neymeha.game.seeinggod.ecs.utils.Mappers
 
 /**
@@ -24,13 +25,32 @@ class SpawnSystem(private val engine: Engine) : EntitySystem() {
         // Перебираем всех "живых" врагов
         for (entity in entities) {
             val health = Mappers.health.get(entity)
+            val type = Mappers.type.get(entity)
+
             if (health.currentHealth <= 0) {
-                Log.logger.info { "Враг с ID ${entity} погиб. Спавним нового врага." }
+                Log.logger.info { "Враг с ID ${entity} погиб, и уронил золото. Спавним нового врага." }
                 // Удаляем мертвого врага
                 engine.removeEntity(entity)
 
                 // Создаем нового врага через EnemyFactory
-                engine.addEntity(EnemyFactory.createEnemy())
+                // а так же спавним золото
+                when (type.type) {
+                    EntityType.BOSS -> {
+                        val goldList = EntityFactory.createGold(3, 1)
+                        for (gold in goldList) {
+                            engine.addEntity(gold)
+                        }
+                        engine.addEntity(EntityFactory.createEnemy(100))
+                    }
+                    EntityType.ENEMY -> {
+                        val goldList = EntityFactory.createGold(3, 1)
+                        for (gold in goldList) {
+                            engine.addEntity(gold)
+                        }
+                        engine.addEntity(EntityFactory.createEnemy(100))
+                    }
+                    else -> {}
+                }
 
                 // Прерываем цикл — в текущей версии только один враг активен за раз
                 break

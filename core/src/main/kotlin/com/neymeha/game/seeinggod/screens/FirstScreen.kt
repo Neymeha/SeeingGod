@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.neymeha.game.seeinggod.ecs.components.PositionComponent
-import com.neymeha.game.seeinggod.ecs.factory.EnemyFactory
+import com.neymeha.game.seeinggod.ecs.factory.EntityFactory
 import com.neymeha.game.seeinggod.ecs.systems.*
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
@@ -36,7 +36,7 @@ class FirstScreen : KtxScreen {
         engine.addSystem(SpawnSystem(engine))
 
         // Создаем первого врага (через EnemyFactory)
-        engine.addEntity(EnemyFactory.createEnemy())
+        engine.addEntity(EntityFactory.createEnemy(100))
         Log.logger.info { "Враг создан и добавлен в движок." }
     }
 

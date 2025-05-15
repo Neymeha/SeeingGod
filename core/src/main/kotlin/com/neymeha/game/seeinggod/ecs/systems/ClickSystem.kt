@@ -41,12 +41,22 @@ class ClickSystem : EntitySystem() {
 
                 // Проверяем, попадает ли точка касания в область сущности
                 // Для этого мы сравниваем координаты касания с размерами сущности
-                if (type.type == EntityType.ENEMY && touchPos.x in pos.x..(pos.x + pos.width) && invertedY in pos.y..(pos.y + pos.height)) {
+                if (type.type == EntityType.ENEMY || type.type == EntityType.BOSS && touchPos.x in pos.x..(pos.x + pos.width) && invertedY in pos.y..(pos.y + pos.height)) {
                     // Если клик произошел по сущности, добавляем ей DamageComponent с фиксированным уроном (10)
                     entity.add(DamageComponent(10)) // фиксированный урон
                     Log.logger.info { "Сущность была поражена, нанесен урон." }
                     break // Заканчиваем цикл, чтобы не обрабатывать несколько кликов на разных сущностях
                 }
+
+                if (type.type == EntityType.GOLD && touchPos.x in pos.x..(pos.x + pos.width) && invertedY in pos.y..(pos.y + pos.height)) {
+                    // Если клик произошел по сущности, добавляем ей DamageComponent с фиксированным уроном (10)
+                    entity.add(DamageComponent(10)) // фиксированный урон
+                    Log.logger.info { "Клик по золоту!" }
+                    // Механизм получения золота
+                    // Увеличение счета или других параметров
+                    break // Заканчиваем цикл, чтобы не обрабатывать несколько кликов на разных сущностях
+                }
+
             }
         }
     }

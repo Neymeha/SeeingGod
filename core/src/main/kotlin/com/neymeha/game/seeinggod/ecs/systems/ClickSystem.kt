@@ -8,55 +8,57 @@ import com.neymeha.game.seeinggod.ecs.components.*
 import com.neymeha.game.seeinggod.ecs.utils.Mappers
 
 /**
- * Система ClickSystem отслеживает клики по сущностям с компонентом ClickComponent.
- * Когда пользователь кликает по экрану, система проверяет, был ли клик по какой-либо сущности.
- * Если клик был на сущности, то она получает урон, добавляя DamageComponent.
+ * ClickSystem — система обработки кликов по сущностям.
+ * Если пользователь кликает по врагу или золоту, соответствующей сущности наносится урон.
  */
 class ClickSystem : EntitySystem() {
 
-    // Получаем все сущности, которые имеют как компонент ClickComponent, так и компонент PositionComponent.
+    // Получаем сущности, у которых есть и позиция, и компонент клика
     private val entities: ImmutableArray<Entity>
-        get() = engine
-            .getEntitiesFor(
-                Family.all(ClickComponent::class.java, PositionComponent::class.java).get()
-            )
+        get() = engine.getEntitiesFor(
+            Family.all(ClickComponent::class.java, PositionComponent::class.java).get()
+        )
 
     override fun update(deltaTime: Float) {
-        // Проверяем, был ли клик на экране
         if (Gdx.input.justTouched()) {
-            Log.logger.info { "Нажатие" }
+            Log.logger.info { "Клик зафиксирован." }
 
-            // Получаем позицию касания на экране (в пикселях)
+            // Получаем координаты касания
             val touchPos = Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
-
-            // Инвертируем координату Y для того, чтобы она соответствовала системе координат отрисовки
             val invertedY = Gdx.graphics.height - touchPos.y
 
-            // Проходим по всем сущностям с компонентами ClickComponent и PositionComponent
             for (entity in entities) {
-                // Получаем компонент PositionComponent сущности, чтобы узнать её координаты
                 val pos = Mappers.position.get(entity)
                 val type = Mappers.type.get(entity)
-                Log.logger.info { "Нашли энтити, которое реагирует на нажатие его x:${pos.x} y:${pos.y} нажатие x:${touchPos.x} y:${invertedY}" }
 
-                // Проверяем, попадает ли точка касания в область сущности
-                // Для этого мы сравниваем координаты касания с размерами сущности
-                if (type.type == EntityType.ENEMY || type.type == EntityType.BOSS && touchPos.x in pos.x..(pos.x + pos.width) && invertedY in pos.y..(pos.y + pos.height)) {
-                    // Если клик произошел по сущности, добавляем ей DamageComponent с фиксированным уроном (10)
-                    entity.add(DamageComponent(10)) // фиксированный урон
-                    Log.logger.info { "Сущность была поражена, нанесен урон." }
-                    break // Заканчиваем цикл, чтобы не обрабатывать несколько кликов на разных сущностях
+                val withinBounds = touchPos.x in pos.x..(pos.x + pos.width) &&
+                    invertedY in pos.y..(pos.y + pos.height)
+
+                if (!withinBounds) continue
+
+                when (type.type) {
+                    EntityType.ENEMY, EntityType.BOSS -> {
+                        entity.add(DamageComponent(10))
+                        Log.logger.info {
+                            "Урон нанесён по сущности типа ${type.type}. Координаты попадания: x=${touchPos.x}, y=${invertedY}"
+                        }
+                    }
+
+                    EntityType.GOLD -> {
+                        entity.add(DamageComponent(10))
+                        Log.logger.info {
+                            "Клик по золоту. Координаты: x=${touchPos.x}, y=${invertedY}, value=${Mappers.gold.get(entity).value}"
+                        }
+                    }
+
+                    else -> {
+                        Log.logger.info {
+                            "Клик был по сущности типа ${type.type}, но она не обрабатывается системой кликов."
+                        }
+                    }
                 }
 
-                if (type.type == EntityType.GOLD && touchPos.x in pos.x..(pos.x + pos.width) && invertedY in pos.y..(pos.y + pos.height)) {
-                    // Если клик произошел по сущности, добавляем ей DamageComponent с фиксированным уроном (10)
-                    entity.add(DamageComponent(10)) // фиксированный урон
-                    Log.logger.info { "Клик по золоту!" }
-                    // Механизм получения золота
-                    // Увеличение счета или других параметров
-                    break // Заканчиваем цикл, чтобы не обрабатывать несколько кликов на разных сущностях
-                }
-
+                break // только одна сущность обрабатывается за кадр
             }
         }
     }

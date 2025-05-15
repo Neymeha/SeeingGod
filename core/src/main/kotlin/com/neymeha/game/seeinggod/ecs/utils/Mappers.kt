@@ -17,6 +17,7 @@ object Mappers {
     val click = ComponentMapper.getFor(ClickComponent::class.java)
     val position = ComponentMapper.getFor(PositionComponent::class.java)
     val type = ComponentMapper.getFor(EntityTypeComponent::class.java)
+    val gold = ComponentMapper.getFor(GoldComponent::class.java)
 
     init {
         Log.logger.info { "Mappers инициализированы." }

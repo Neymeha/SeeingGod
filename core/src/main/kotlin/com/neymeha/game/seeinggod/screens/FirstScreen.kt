@@ -1,35 +1,21 @@
 package com.neymeha.game.seeinggod.screens
 
 import com.badlogic.ashley.core.Engine
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.neymeha.game.seeinggod.ecs.components.EntityType
-import com.neymeha.game.seeinggod.ecs.components.PositionComponent
 import com.neymeha.game.seeinggod.ecs.factory.EntityFactory
 import com.neymeha.game.seeinggod.ecs.systems.*
-import com.neymeha.game.seeinggod.ecs.utils.Mappers
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.assets.disposeSafely
-import ktx.graphics.use
 
 /**
- * Главный экран игры. Здесь инициализируются ECS-системы, создаются сущности и обрабатывается рендеринг.
+ * Главный экран игры. Отвечает за инициализацию ECS-движка, систем и стартовых сущностей.
+ * Логика отрисовки полностью вынесена в RenderSystem.
  */
 class FirstScreen : KtxScreen {
 
     private val engine = Engine()
     private val batch = SpriteBatch()
-
-    // Используем карту текстур по типу сущностей
-    private val textures: Map<EntityType, Texture> = mapOf(
-        EntityType.ENEMY to Texture("enemy.png"),
-//        EntityType.BOSS to Texture("boss.png"),
-        EntityType.GOLD to Texture("gold.png"),
-//        EntityType.PLAYER to Texture("player.png"),
-//        EntityType.COMPANION to Texture("companion.png"),
-//        EntityType.ATTENDANT to Texture("attendant.png")
-    )
 
     init {
         Log.logger.info { "Инициализация FirstScreen..." }
@@ -44,54 +30,39 @@ class FirstScreen : KtxScreen {
      * Добавляет все необходимые системы в движок.
      */
     private fun setupSystems() {
-        Log.logger.info { "Добавление систем..." }
+        Log.logger.info { "Добавление ECS-систем..." }
         engine.addSystem(ClickSystem())
         engine.addSystem(DamageSystem())
         engine.addSystem(SpawnSystem(engine))
+        engine.addSystem(RenderSystem(batch)) // Отрисовка теперь через отдельную систему
     }
 
     /**
-     * Создает стартовые сущности.
+     * Создание стартовых сущностей через фабрику.
      */
     private fun createInitialEntities() {
         val enemy = EntityFactory.createEnemy(100)
         engine.addEntity(enemy)
         Log.logger.info { "Создан и добавлен первый враг: $enemy" }
+
+        // Также здесь можно создавать других персонажей по желанию
+        // val player = EntityFactory.createPlayer()
+        // engine.addEntity(player)
     }
 
     /**
-     * Рендер кадра. Очищает экран, обновляет ECS и отрисовывает сущности с позициями.
+     * Основной цикл рендера: обновляет ECS-движок. Очистка экрана и отрисовка происходит внутри RenderSystem.
      */
     override fun render(delta: Float) {
-        clearScreen(red = 0.2f, green = 0.2f, blue = 0.2f)
-
+        clearScreen(0.2f, 0.2f, 0.2f, 1f) // Тёмно-серый фон
         engine.update(delta)
-
-        batch.use {
-            engine.entities.forEach { entity ->
-                val pos: PositionComponent = Mappers.position.get(entity) ?: return@forEach
-                val type = Mappers.type.get(entity) ?: return@forEach
-
-                val texture = textures[type.type]
-                if (texture == null) {
-                    Log.logger.warn { "Нет текстуры для типа: ${type.type}" }
-                    return@forEach
-                }
-
-                it.draw(texture, pos.x, pos.y, pos.width, pos.height)
-            }
-        }
     }
 
     /**
-     * Очистка ресурсов — вызывается при уничтожении экрана.
+     * Очистка ресурсов.
      */
     override fun dispose() {
         Log.logger.info { "Освобождение ресурсов FirstScreen..." }
-
-        textures.values.forEach { it.disposeSafely() }
         batch.disposeSafely()
-
-        Log.logger.info { "Ресурсы FirstScreen успешно освобождены." }
     }
 }

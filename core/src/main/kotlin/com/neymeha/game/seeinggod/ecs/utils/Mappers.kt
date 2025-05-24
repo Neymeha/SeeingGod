@@ -18,6 +18,8 @@ object Mappers {
     val position = ComponentMapper.getFor(PositionComponent::class.java)
     val type = ComponentMapper.getFor(EntityTypeComponent::class.java)
     val gold = ComponentMapper.getFor(GoldComponent::class.java)
+    val animation = ComponentMapper.getFor(AnimationComponent::class.java)
+//    val texture = ComponentMapper.getFor(TextureComponent::class.java)
 
     init {
         Log.logger.info { "Mappers инициализированы." }
